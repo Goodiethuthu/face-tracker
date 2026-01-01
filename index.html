@@ -20,7 +20,7 @@ body {
   height: 400px;
 }
 
-/* Face overlay on top of eyes */
+/* Face overlay on top */
 .face-overlay {
   width: 100%;
   display: block;
@@ -38,9 +38,9 @@ body {
   z-index: 2;
 }
 
-/* Eye positions inside the container */
-.left-eye { top: 130px; left: 110px; }
-.right-eye { top: 130px; left: 230px; }
+/* Eye positions exactly aligned with transparent sockets */
+.left-eye { top: 306px; left: 123px; }
+.right-eye { top: 290px; left: 222px; }
 
 /* Pupils inside eyes */
 .pupil {
@@ -77,7 +77,7 @@ document.addEventListener("mousemove", (e) => {
     const dx = e.clientX - centerX;
     const dy = e.clientY - centerY;
     const angle = Math.atan2(dy, dx);
-    const maxMove = rect.width * 0.25; // px, movement radius
+    const maxMove = rect.width * 0.25; // movement radius
     pupil.style.transform = `translate(${Math.cos(angle) * maxMove}px, ${Math.sin(angle) * maxMove}px)`;
   });
 });
