@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Responsive Face Tracker</title>
+<title>Face Tracker</title>
 <style>
 body {
   margin: 0;
@@ -11,26 +11,16 @@ body {
   height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: center; /* vertically center */
-}
-
-.stage {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
   align-items: center;
 }
 
 .face-container {
-  width: min(25vw, 400px); /* responsive width */
-  max-height: 90vh;        /* never taller than viewport */
-  aspect-ratio: 1 / 1;     /* keep square */
   position: relative;
+  width: 400px;
+  height: 400px;
 }
 
-/* Face overlay on top */
+/* Face overlay on top of eyes */
 .face-overlay {
   width: 100%;
   display: block;
@@ -39,57 +29,56 @@ body {
   pointer-events: none;
 }
 
-/* Eye container */
+/* Eye containers behind the face */
 .eye {
   position: absolute;
-  width: 15%;           /* % of face container width */
-  aspect-ratio: 1 / 1;
+  width: 60px;
+  height: 60px;
   overflow: visible;
   z-index: 2;
 }
 
-/* Correct eye positions inside container (percent of container width/height) */
-.left-eye { top: 35%; left: 27%; }
-.right-eye { top: 35%; left: 56%; }
+/* Eye positions inside the container */
+.left-eye { top: 130px; left: 110px; }
+.right-eye { top: 130px; left: 230px; }
 
-/* Pupils scale with eye container */
+/* Pupils inside eyes */
 .pupil {
-  width: 50%;
+  width: 30px;
   position: absolute;
-  top: 25%;
-  left: 25%;
+  top: 15px;
+  left: 15px;
   transition: transform 0.08s ease-out;
 }
 </style>
 </head>
 <body>
 
-<div class="stage">
-  <div class="face-container">
-    <!-- Eyes -->
-    <div class="eye left-eye">
-      <img src="eye.png" class="pupil" alt="">
-    </div>
-    <div class="eye right-eye">
-      <img src="eye.png" class="pupil" alt="">
-    </div>
-
-    <!-- Face overlay -->
-    <img src="face.png" class="face-overlay" alt="">
+<div class="face-container">
+  <!-- Eyes -->
+  <div class="eye left-eye">
+    <img src="eye.png" class="pupil" alt="">
   </div>
+  <div class="eye right-eye">
+    <img src="eye.png" class="pupil" alt="">
+  </div>
+
+  <!-- Face overlay -->
+  <img src="face.png" class="face-overlay" alt="">
 </div>
 
 <script>
 document.addEventListener("mousemove", (e) => {
-  const faceRect = document.querySelector('.face-container').getBoundingClientRect();
   document.querySelectorAll(".eye").forEach(eye => {
     const pupil = eye.querySelector(".pupil");
-    const eyeRect = eye.getBoundingClientRect();
-    const cx = eyeRect.left + eyeRect.width / 2;
-    const cy = eyeRect.top + eyeRect.height / 2;
-    const angle = Math.atan2(e.clientY - cy, e.clientX - cx);
-    const move = eyeRect.width * 0.25;
-    pupil.style.transform = `translate(${Math.cos(angle) * move}px, ${Math.sin(angle) * move}px)`;
+    const rect = eye.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const dx = e.clientX - centerX;
+    const dy = e.clientY - centerY;
+    const angle = Math.atan2(dy, dx);
+    const maxMove = rect.width * 0.25; // px, movement radius
+    pupil.style.transform = `translate(${Math.cos(angle) * maxMove}px, ${Math.sin(angle) * maxMove}px)`;
   });
 });
 </script>
