@@ -1,100 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Face Tracker</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Face Tracker</title>
+  <style>
+    :root { background: white; }
 
-<style>
-  body {
-    margin: 0;
-    background: white;
-    height: 100vh;
-    display: grid;
-    place-items: center;
-  }
+    body {
+      margin: 0;
+      background: white;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+    }
 
-  /* Choose a fixed display width for desktop */
-  .face-container {
-    position: relative;
-    width: 900px;                 /* <- adjust this if you want bigger/smaller */
-    aspect-ratio: 1332 / 758;     /* <- preserves the real image proportions */
-  }
+    /* This is the "stage" for your face + eyes */
+    .wrap {
+      width: min(900px, 95vw); /* desktop-friendly; scales down if needed */
+    }
 
-  .face-overlay {
-    width: 100%;
-    height: 100%;
-    display: block;
-    position: relative;
-    z-index: 3;
-    pointer-events: none;
-  }
+    .face-container {
+      position: relative;
+      width: 100%;
+      /* Keep the same aspect ratio as the original image */
+      aspect-ratio: 1332 / 758;
+      background: white;
+      overflow: visible;
+    }
 
-  .eye {
-    position: absolute;
-    width: 110px;     /* eye box size (desktop) */
-    height: 110px;
-    overflow: visible;
-    z-index: 2;       /* behind face */
-    transform: translate(-50%, -50%); /* anchor by center point */
-  }
+    /* The face overlay image is on top */
+    #faceOverlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      z-index: 3;
+      pointer-events: none;
+      display: block;
+    }
 
-  /* Eye centers from your measured data:
-     left center = (510, 635) on (1332, 758) => (38.288%, 83.773%)
-     right center = (840, 605) => (63.063%, 79.815%)
-  */
-  .left-eye  { left: 38.288%; top: 83.773%; }
-  .right-eye { left: 63.063%; top: 79.815%; }
+    /* Eye container sits under the face */
+    .eye {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      z-index: 2;
+      transform: translate(-50%, -50%); /* anchor the eye by its center */
+      overflow: visible;
+      /* debug: uncomment next line if you ever want to see eye boxes */
+      /* outline: 1px solid rgba(255,0,0,.3); */
+    }
 
-  .pupil {
-    position: absolute;
-    width: 55px;
-    height: auto;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%); /* baseline centering */
-    transition: transform 0.08s ease-out;
-    will-change: transform;
-  }
-</style>
+    .pupil {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 60px;
+      height: auto;
+      transform: translate(-50%, -50%);
+      transition: transform 0.08s ease-out;
+      will-change: transform;
+      user-select: none;
+      pointer-events: none;
+      /* debug: uncomment if pupil is hard to see */
+      /* background: rgba(0,255,0,.1); */
+    }
+  </style>
 </head>
 
 <body>
-  <div class="face-container">
-    <div class="eye left-eye">
-      <img src="eye.png" class="pupil" alt="" />
-    </div>
-    <div class="eye right-eye">
-      <img src="eye.png" class="pupil" alt="" />
-    </div>
+  <div class="wrap">
+    <div class="face-container" id="faceContainer">
+      <!-- Eyes (behind) -->
+      <div class="eye" id="leftEye">
+        <img src="eye.png" class="pupil" alt="" />
+      </div>
+      <div class="eye" id="rightEye">
+        <img src="eye.png" class="pupil" alt="" />
+      </div>
 
-    <img src="face.png" class="face-overlay" alt="" />
+      <!-- Face overlay (on top) -->
+      <img id="faceOverlay" src="face.png" alt="" />
+    </div>
   </div>
 
-<script>
-  document.addEventListener("mousemove", (e) => {
-    document.querySelectorAll(".eye").forEach((eye) => {
-      const pupil = eye.querySelector(".pupil");
-      const r = eye.getBoundingClientRect();
+  <script>
+    // Your measured values (pixel coordinates in the ORIGINAL face image)
+    const ORIGINAL_W = 1332;
+    const ORIGINAL_H = 758;
 
-      const cx = r.left + r.width / 2;
-      const cy = r.top + r.height / 2;
+    // Eye SOCKET CENTERS (not borders)
+    const LEFT_CENTER  = { x: 510, y: 635 };
+    const RIGHT_CENTER = { x: 840, y: 605 };
 
-      const dx = e.clientX - cx;
-      const dy = e.clientY - cy;
+    const face = document.getElementById("faceOverlay");
+    const faceContainer = document.getElementById("faceContainer");
+    const leftEye = document.getElementById("leftEye");
+    const rightEye = document.getElementById("rightEye");
 
-      const angle = Math.atan2(dy, dx);
+    function placeEyes() {
+      // Use the *displayed* container size
+      const r = faceContainer.getBoundingClientRect();
 
-      // movement radius (tune this)
-      const maxMove = r.width * 0.18;
+      const scaleX = r.width / ORIGINAL_W;
+      const scaleY = r.height / ORIGINAL_H;
 
-      const x = Math.cos(angle) * maxMove;
-      const y = Math.sin(angle) * maxMove;
+      // Convert original-image pixel coords -> displayed coords
+      const leftX = LEFT_CENTER.x * scaleX;
+      const leftY = LEFT_CENTER.y * scaleY;
 
-      // keep the pupil centered, then offset it
-      pupil.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
+      const rightX = RIGHT_CENTER.x * scaleX;
+      const rightY = RIGHT_CENTER.y * scaleY;
+
+      leftEye.style.left = leftX + "px";
+      leftEye.style.top  = leftY + "px";
+
+      rightEye.style.left = rightX + "px";
+      rightEye.style.top  = rightY + "px";
+    }
+
+    // Cursor tracking: keep pupil centered then offset
+    function onMouseMove(e) {
+      document.querySelectorAll(".eye").forEach((eye) => {
+        const pupil = eye.querySelector(".pupil");
+        const er = eye.getBoundingClientRect();
+
+        const cx = er.left + er.width / 2;
+        const cy = er.top + er.height / 2;
+
+        const dx = e.clientX - cx;
+        const dy = e.clientY - cy;
+
+        const angle = Math.atan2(dy, dx);
+
+        // Movement radius: proportional to eye size
+        const maxMove = er.width * 0.18;
+
+        const x = Math.cos(angle) * maxMove;
+        const y = Math.sin(angle) * maxMove;
+
+        pupil.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
+      });
+    }
+
+    // Ensure we place eyes after image loads (so layout is stable)
+    face.addEventListener("load", () => {
+      placeEyes();
+      window.addEventListener("resize", placeEyes);
+      document.addEventListener("mousemove", onMouseMove);
     });
-  });
-</script>
+
+    // In case the image is cached and load doesn’t fire reliably
+    if (face.complete) {
+      placeEyes();
+      window.addEventListener("resize", placeEyes);
+      document.addEventListener("mousemove", onMouseMove);
+    }
+  </script>
 </body>
 </html>
