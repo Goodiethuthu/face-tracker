@@ -1,1 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Face Tracker</title>
+
+<style>
+body {
+  margin: 0;
+  background: white;
+  height: 100vh;
+}
+
+.stage {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+.face-container {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  top: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.face-overlay {
+  width: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+.eye {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  overflow: hidden;
+}
+
+.left-eye {
+  top: 160px;
+  left: 120px;
+}
+
+.right-eye {
+  top: 152px;
+  left: 220px;
+}
+
+.pupil {
+  width: 30px;
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  transition: transform 0.08s ease-out;
+}
+</style>
+</head>
+
+<body>
+<div class="stage">
+  <div class="face-container">
+    <div class="eye left-eye">
+      <img src="eye.png" class="pupil" alt="">
+    </div>
+    <div class="eye right-eye">
+      <img src="eye.png" class="pupil" alt="">
+    </div>
+    <img src="face.png" class="face-overlay" alt="">
+  </div>
+</div>
+
+<script>
+document.addEventListener("mousemove", (e) => {
+  document.querySelectorAll(".eye").forEach(eye => {
+    const pupil = eye.querySelector(".pupil");
+    const r = eye.getBoundingClientRect();
+
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
+
+    const angle = Math.atan2(e.clientY - cy, e.clientX - cx);
+    const move = r.width * 0.15;
+
+    pupil.style.transform =
+      `translate(${Math.cos(angle) * move}px, ${Math.sin(angle) * move}px)`;
+  });
+});
+</script>
+</body>
+</html>
 
