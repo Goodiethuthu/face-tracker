@@ -5,66 +5,61 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Face Tracker</title>
 <style>
-  /* Full-page stage */
-  body {
-    margin: 0;
-    background: white;
-    height: 100vh;
-  }
+body {
+  margin: 0;
+  background: white;
+  height: 100vh;
+}
 
-  .stage {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-  }
+.stage {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
 
-  /* Fixed-size face container, centered horizontally */
-  .face-container {
-    position: absolute;
-    width: 400px;
-    height: 400px;
-    top: 120px; /* adjust vertical position if needed */
-    left: 50%;
-    transform: translateX(-50%);
-  }
+.face-container {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* vertically center */
+}
 
-  /* Face overlay - on top of eyes */
-  .face-overlay {
-    width: 100%;
-    display: block;
-    position: relative; /* required for z-index to take effect */
-    z-index: 3;
-    pointer-events: none;
-  }
+.face-overlay {
+  width: 100%;
+  display: block;
+  position: relative;
+  z-index: 3; /* on top of eyes */
+  pointer-events: none;
+}
 
-  /* Eye container - positioned absolutely below face */
-  .eye {
-    position: absolute;
-    width: 15%;       /* percentage of face container */
-    aspect-ratio: 1/1;
-    overflow: hidden;
-    z-index: 2;       /* below face */
-  }
+.eye {
+  position: absolute;
+  width: 60px;      /* fixed pixel size ensures pupils are visible */
+  height: 60px;
+  overflow: visible; /* allow pupils to move outside if needed */
+  z-index: 2;
+}
 
-  /* Eye positions as percentages for responsiveness */
-  .left-eye { top: 40%; left: 30%; }
-  .right-eye { top: 38%; left: 55%; }
+/* Eye positions relative to container */
+.left-eye { top: 130px; left: 110px; }
+.right-eye { top: 130px; left: 230px; }
 
-  /* Pupil */
-  .pupil {
-    width: 50%;
-    position: absolute;
-    top: 25%;
-    left: 25%;
-    transition: transform 0.08s ease-out;
-  }
+.pupil {
+  width: 30px;
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  transition: transform 0.08s ease-out;
+}
 </style>
 </head>
 <body>
 
 <div class="stage">
   <div class="face-container">
-    <!-- Eyes (behind the face) -->
+    <!-- Eyes under face -->
     <div class="eye left-eye">
       <img src="eye.png" class="pupil" alt="">
     </div>
@@ -78,17 +73,17 @@
 </div>
 
 <script>
-  document.addEventListener("mousemove", (e) => {
-    document.querySelectorAll(".eye").forEach(eye => {
-      const pupil = eye.querySelector(".pupil");
-      const r = eye.getBoundingClientRect();
-      const cx = r.left + r.width / 2;
-      const cy = r.top + r.height / 2;
-      const angle = Math.atan2(e.clientY - cy, e.clientX - cx);
-      const move = r.width * 0.15; // movement radius proportional to eye size
-      pupil.style.transform = `translate(${Math.cos(angle) * move}px, ${Math.sin(angle) * move}px)`;
-    });
+document.addEventListener("mousemove", (e) => {
+  document.querySelectorAll(".eye").forEach(eye => {
+    const pupil = eye.querySelector(".pupil");
+    const r = eye.getBoundingClientRect();
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
+    const angle = Math.atan2(e.clientY - cy, e.clientX - cx);
+    const move = r.width * 0.25; // slightly larger movement
+    pupil.style.transform = `translate(${Math.cos(angle) * move}px, ${Math.sin(angle) * move}px)`;
   });
+});
 </script>
 
 </body>
