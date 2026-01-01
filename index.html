@@ -20,36 +20,39 @@ body {
   height: 100%;
   display: flex;
   justify-content: center;
-  align-items: center; /* vertically center the face container */
+  align-items: center;
 }
 
 .face-container {
-  width: min(25vw, 400px); /* responsive width, max 400px */
+  width: min(25vw, 400px); /* responsive width */
   max-height: 90vh;        /* never taller than viewport */
   aspect-ratio: 1 / 1;     /* keep square */
   position: relative;
 }
 
+/* Face overlay on top */
 .face-overlay {
   width: 100%;
   display: block;
   position: relative;
-  z-index: 3;          /* on top of eyes */
+  z-index: 3;
   pointer-events: none;
 }
 
+/* Eye container */
 .eye {
   position: absolute;
-  width: 15%;
+  width: 15%;           /* % of face container width */
   aspect-ratio: 1 / 1;
-  overflow: visible;   /* allow pupil movement */
-  z-index: 2;          /* behind face overlay */
+  overflow: visible;
+  z-index: 2;
 }
 
-/* Eye positions inside container */
-.left-eye { top: 37%; left: 28%; }
-.right-eye { top: 37%; left: 57%; }
+/* Correct eye positions inside container (percent of container width/height) */
+.left-eye { top: 35%; left: 27%; }
+.right-eye { top: 35%; left: 56%; }
 
+/* Pupils scale with eye container */
 .pupil {
   width: 50%;
   position: absolute;
@@ -78,13 +81,14 @@ body {
 
 <script>
 document.addEventListener("mousemove", (e) => {
+  const faceRect = document.querySelector('.face-container').getBoundingClientRect();
   document.querySelectorAll(".eye").forEach(eye => {
     const pupil = eye.querySelector(".pupil");
-    const r = eye.getBoundingClientRect();
-    const cx = r.left + r.width / 2;
-    const cy = r.top + r.height / 2;
+    const eyeRect = eye.getBoundingClientRect();
+    const cx = eyeRect.left + eyeRect.width / 2;
+    const cy = eyeRect.top + eyeRect.height / 2;
     const angle = Math.atan2(e.clientY - cy, e.clientX - cx);
-    const move = r.width * 0.25;
+    const move = eyeRect.width * 0.25;
     pupil.style.transform = `translate(${Math.cos(angle) * move}px, ${Math.sin(angle) * move}px)`;
   });
 });
