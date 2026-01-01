@@ -28,19 +28,22 @@
     transform: translateX(-50%);
   }
 
-  /* Face overlay */
+  /* Face overlay - on top of eyes */
   .face-overlay {
     width: 100%;
     display: block;
+    position: relative; /* required for z-index to take effect */
+    z-index: 3;
     pointer-events: none;
   }
 
-  /* Eye container */
+  /* Eye container - positioned absolutely below face */
   .eye {
     position: absolute;
     width: 15%;       /* percentage of face container */
     aspect-ratio: 1/1;
     overflow: hidden;
+    z-index: 2;       /* below face */
   }
 
   /* Eye positions as percentages for responsiveness */
@@ -61,7 +64,7 @@
 
 <div class="stage">
   <div class="face-container">
-    <!-- Eyes -->
+    <!-- Eyes (behind the face) -->
     <div class="eye left-eye">
       <img src="eye.png" class="pupil" alt="">
     </div>
@@ -69,7 +72,7 @@
       <img src="eye.png" class="pupil" alt="">
     </div>
 
-    <!-- Face -->
+    <!-- Face overlay on top -->
     <img src="face.png" class="face-overlay" alt="">
   </div>
 </div>
