@@ -3,50 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Responsive Face Tracker</title>
+<title>Face Tracker</title>
 <style>
 body {
   margin: 0;
   background: white;
   height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center; /* vertically center */
 }
 
 .stage {
   position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center; /* vertically center the face container */
+  width: 100vw;
+  height: 100vh;
 }
 
 .face-container {
-  width: min(25vw, 400px); /* responsive width, max 400px */
-  max-height: 90vh;        /* never taller than viewport */
-  aspect-ratio: 1 / 1;     /* keep square */
-  position: relative;
+  position: absolute;
+  width: 400px;          /* fixed size */
+  height: 400px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* vertically + horizontally center */
 }
 
 .face-overlay {
   width: 100%;
   display: block;
   position: relative;
-  z-index: 3;          /* on top of eyes */
+  z-index: 3;              /* on top of eyes */
   pointer-events: none;
 }
 
 .eye {
   position: absolute;
-  width: 15%;
-  aspect-ratio: 1 / 1;
-  overflow: visible;   /* allow pupil movement */
-  z-index: 2;          /* behind face overlay */
+  width: 15%;              /* percentage of container width */
+  aspect-ratio: 1/1;
+  overflow: visible;       /* allow pupil movement */
+  z-index: 2;              /* behind face overlay */
 }
 
-/* Eye positions inside container */
+/* Eye positions as percentage of face container */
 .left-eye { top: 37%; left: 28%; }
 .right-eye { top: 37%; left: 57%; }
 
@@ -63,7 +59,7 @@ body {
 
 <div class="stage">
   <div class="face-container">
-    <!-- Eyes -->
+    <!-- Eyes behind the face -->
     <div class="eye left-eye">
       <img src="eye.png" class="pupil" alt="">
     </div>
@@ -71,7 +67,7 @@ body {
       <img src="eye.png" class="pupil" alt="">
     </div>
 
-    <!-- Face overlay -->
+    <!-- Face overlay on top -->
     <img src="face.png" class="face-overlay" alt="">
   </div>
 </div>
@@ -84,7 +80,7 @@ document.addEventListener("mousemove", (e) => {
     const cx = r.left + r.width / 2;
     const cy = r.top + r.height / 2;
     const angle = Math.atan2(e.clientY - cy, e.clientX - cx);
-    const move = r.width * 0.25;
+    const move = r.width * 0.25; // movement radius proportional to eye size
     pupil.style.transform = `translate(${Math.cos(angle) * move}px, ${Math.sin(angle) * move}px)`;
   });
 });
