@@ -42,31 +42,28 @@
     }
 
     /* Eye container sits under the face */
-    .eye {
-      position: absolute;
-      width: 120px;
-      height: 120px;
-      z-index: 2;
-      transform: translate(-50%, -50%); /* anchor the eye by its center */
-      overflow: visible;
-      /* debug: uncomment next line if you ever want to see eye boxes */
-      /* outline: 1px solid rgba(255,0,0,.3); */
-    }
+   .eye {
+  position: absolute;
+  width: 9%;              /* was fixed px */
+  aspect-ratio: 1 / 1;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  overflow: visible;
+}
 
-    .pupil {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 76px;
-      height: auto;
-      transform: translate(-50%, -50%);
-      transition: transform 0.08s ease-out;
-      will-change: transform;
-      user-select: none;
-      pointer-events: none;
-      /* debug: uncomment if pupil is hard to see */
-      /* background: rgba(0,255,0,.1); */
-    }
+.pupil {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 55%;             /* relative to eye box */
+  height: auto;
+  transform: translate(-50%, -50%);
+  transition: transform 0.08s ease-out;
+  will-change: transform;
+  user-select: none;
+  pointer-events: none;
+}
+
   </style>
 </head>
 
