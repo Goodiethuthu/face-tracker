@@ -9,41 +9,44 @@ body {
   margin: 0;
   background: white;
   height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center; /* vertically center */
 }
 
 .stage {
   position: relative;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center; /* vertically center the face container */
 }
 
 .face-container {
-  position: absolute;
-  width: 25vw;          /* responsive width */
-  max-width: 400px;     /* do not exceed original size */
-  aspect-ratio: 1 / 1;  /* maintain square shape */
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  width: min(25vw, 400px); /* responsive width, max 400px */
+  max-height: 90vh;        /* never taller than viewport */
+  aspect-ratio: 1 / 1;     /* keep square */
+  position: relative;
 }
 
 .face-overlay {
   width: 100%;
   display: block;
   position: relative;
-  z-index: 3;           /* on top of eyes */
+  z-index: 3;          /* on top of eyes */
   pointer-events: none;
 }
 
 .eye {
   position: absolute;
-  width: 15%;           /* percentage of container width */
+  width: 15%;
   aspect-ratio: 1 / 1;
-  overflow: visible;    /* allow pupil movement */
-  z-index: 2;           /* behind face */
+  overflow: visible;   /* allow pupil movement */
+  z-index: 2;          /* behind face overlay */
 }
 
-/* Eye positions as percentages of container (aligned with transparent sockets) */
+/* Eye positions inside container */
 .left-eye { top: 37%; left: 28%; }
 .right-eye { top: 37%; left: 57%; }
 
@@ -60,7 +63,7 @@ body {
 
 <div class="stage">
   <div class="face-container">
-    <!-- Eyes behind the face -->
+    <!-- Eyes -->
     <div class="eye left-eye">
       <img src="eye.png" class="pupil" alt="">
     </div>
@@ -68,7 +71,7 @@ body {
       <img src="eye.png" class="pupil" alt="">
     </div>
 
-    <!-- Face overlay on top -->
+    <!-- Face overlay -->
     <img src="face.png" class="face-overlay" alt="">
   </div>
 </div>
@@ -81,7 +84,7 @@ document.addEventListener("mousemove", (e) => {
     const cx = r.left + r.width / 2;
     const cy = r.top + r.height / 2;
     const angle = Math.atan2(e.clientY - cy, e.clientX - cx);
-    const move = r.width * 0.25; // movement radius proportional to eye size
+    const move = r.width * 0.25;
     pupil.style.transform = `translate(${Math.cos(angle) * move}px, ${Math.sin(angle) * move}px)`;
   });
 });
