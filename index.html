@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Face Tracker</title>
+<title>Responsive Face Tracker</title>
 <style>
 body {
   margin: 0;
@@ -19,30 +19,31 @@ body {
 
 .face-container {
   position: absolute;
-  width: 400px;          /* fixed size */
-  height: 400px;
+  width: 25vw;          /* responsive width */
+  max-width: 400px;     /* do not exceed original size */
+  aspect-ratio: 1 / 1;  /* maintain square shape */
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* vertically + horizontally center */
+  transform: translate(-50%, -50%);
 }
 
 .face-overlay {
   width: 100%;
   display: block;
   position: relative;
-  z-index: 3;              /* on top of eyes */
+  z-index: 3;           /* on top of eyes */
   pointer-events: none;
 }
 
 .eye {
   position: absolute;
-  width: 15%;              /* percentage of container width */
-  aspect-ratio: 1/1;
-  overflow: visible;       /* allow pupil movement */
-  z-index: 2;              /* behind face overlay */
+  width: 15%;           /* percentage of container width */
+  aspect-ratio: 1 / 1;
+  overflow: visible;    /* allow pupil movement */
+  z-index: 2;           /* behind face */
 }
 
-/* Eye positions as percentage of face container */
+/* Eye positions as percentages of container (aligned with transparent sockets) */
 .left-eye { top: 37%; left: 28%; }
 .right-eye { top: 37%; left: 57%; }
 
